@@ -30,7 +30,11 @@ func main() {
 
 	var issues Issues
 	
-	json.Unmarshal(input, &issues)
+	err := json.Unmarshal(input, &issues)
+	
+	if err != nil {
+		fmt.Errorf("Error parsing JSON input: %v", err)
+	}
 	
 	for _, issue := range issues.Issues {
 		fmt.Printf("%v %v %v\n", issue.Id, issue.Key, issue.Fields.Summary)
