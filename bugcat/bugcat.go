@@ -11,54 +11,16 @@ import (
 	"os"
 	"io/ioutil"
 	"encoding/json"
+	"bugdozer/jira"
 //	"net/url"
 )
 
-type URL string
-type ID string
 
-type Person struct {
-	DisplayName, EmailAddress, Name string
-	Self URL	
-}
-
-type Comment struct {
-	Author Person
-	Body string
-	Id ID
-	Self URL
-	UpdateAuthor Person
-}
-
-type CommentsSection struct {
-	Comments []Comment
-	MaxResults int
-	StartAt int
-	Total int
-}
-
-// Person assigned to a issue
-type Assignee struct {
-	Person
-}
-
-// A task, bug etc
-type Issue struct {
-	Fields struct {
-		Description, Summary string
-		Labels []string
-		Comment CommentsSection
-		Assignee Assignee
-	}
-	Id ID		// unique number identfier
-	Key string		// a unique string identifier
-	Self URL
-}
 
 func main() {
 	input, _ := ioutil.ReadAll(os.Stdin)
 
-	var issue Issue
+	var issue jira.Issue
 	
 	err := json.Unmarshal(input, &issue)
 	

@@ -11,23 +11,26 @@ import (
 	"os"
 	"io/ioutil"
 	"encoding/json"
-	"net/url"
+	"bugdozer/jira"
+	"flag"
 )
 
+var usageString = `bug ls is a tool for listing projects and issues.
+
+Usage:
+
+	bug-ls item 
+
+The items are:
+	project		list projects
+	issue		list issues
+`
+
 type Issues struct {
-	Issues []struct {
-		Fields struct {
-			Description, Summary string
-		}
-		Id string
-		Key string
-		Self url.URL
-	}
+	Issues []jira.Issue
 }
 
-func main() {
-	input, _ := ioutil.ReadAll(os.Stdin)
-
+func lsIssues(input []byte)  {
 	var issues Issues
 	
 	err := json.Unmarshal(input, &issues)
@@ -39,5 +42,43 @@ func main() {
 	for _, issue := range issues.Issues {
 		fmt.Printf("%v %v %v\n", issue.Id, issue.Key, issue.Fields.Summary)
 	}
+}
+
+func lsProjects(input []byte)  {
+	var projects []jira.Project
 	
+	err := json.Unmarshal(input, &projects)
+	
+	if err != nil {
+		fmt.Errorf("Error parsing JSON input: %v", err)
+	}
+	
+	for _, proj := range projects {
+		fmt.Printf("%v %v %v %v\n", proj.Id, proj.Key, proj.Name, proj.Description)
+	}
+}
+
+func main() {
+	flag.Usage = usage
+	flag.Parse()
+	args := flag.Args()
+	if len(args) < 1 {
+		usage()
+	}
+	
+	input, _ := ioutil.ReadAll(os.Stdin)
+
+	switch {
+	case args[0] == "issue":
+		lsIssues(input)
+	case args[0] == "project":
+		lsProjects(input)
+	default:
+		usage()
+	}
+}
+
+func usage() {
+	fmt.Fprintf(os.Stderr, usageString)
+	os.Exit(2)
 }

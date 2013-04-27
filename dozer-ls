@@ -3,4 +3,17 @@ USER=`cat config/user`
 PASSWD=`cat config/passwd`
 URL=`cat config/baseurl`
 
-curl --user $USER:$PASSWD "$URL/search?jql=assignee=$USER&fields=id,key,summary" | bugls | less
+#curl --user $USER:$PASSWD "$URL/search?jql=assignee=$USER&fields=id,key,summary" | bugls $2
+#curl --user $USER:$PASSWD "$URL/$1" | bugls $1
+
+case "$1" in
+"issue")
+    curl --user $USER:$PASSWD "$URL/search?jql=assignee=$USER&fields=id,key,summary" | bugls $1
+    ;;
+"project")
+    curl --user $USER:$PASSWD "$URL/$1" | bugls $1
+    ;;
+*)
+	echo $1 is not a valid option 
+    ;;
+esac
